@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/ui/utilitis/app_assets.dart';
 import 'package:news_app/ui/utilitis/extension/context_extension.dart';
-
 class NewsWidget extends StatelessWidget {
   const NewsWidget({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Container(
