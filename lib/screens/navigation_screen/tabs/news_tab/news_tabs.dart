@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_list.dart';
 
 import '../../../../apis/api_manger.dart';
+import '../../../../model/app_category.dart';
 import '../../../../model/source.dart';
 import '../../../widget/App_error_widget.dart';
 
 class NewsTabs extends StatelessWidget {
-  const NewsTabs({super.key});
+  final AppCategory category;
+  const NewsTabs(this.category,{super.key,  });
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: ApiManager.loadSources("general"),
+      future: ApiManager.loadSources(category.name),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
