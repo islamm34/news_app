@@ -91,7 +91,7 @@ class NewsViewModel extends ChangeNotifier {
 
 
 
-class NewsViewModel{
+class viewModel{
   StreamController<List<Source>?> controller = StreamController();
   loadSources(String category) async {
     var sources = await ApiManager.loadSources(category);
