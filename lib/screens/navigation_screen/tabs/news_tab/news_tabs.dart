@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../apis/api_manger.dart';
 import '../../../../model/app_category.dart';
 import '../../../../model/source.dart';
-import '../../../widget/App_error_widget.dart';
+import 'news_view_model.dart';
 
 class NewsTab extends StatefulWidget {
   final AppCategory category;
@@ -37,7 +37,7 @@ class _NewsTabState extends State<NewsTab> {
         viewModel = Provider.of(context, listen: true);
         return viewModel.sources.isEmpty
             ? Center(child: CircularProgressIndicator())
-            : buildTabsList(viewModel.sources!);
+            : buildTabsList(viewModel.sources);
       }),
     );
 
@@ -80,14 +80,7 @@ class _NewsTabState extends State<NewsTab> {
   }
 }
 
-class NewsViewModel extends ChangeNotifier {
-  List<Source> sources = [];
 
-  loadSources(String category) async {
-    sources = await ApiManager.loadSources(category);
-    notifyListeners();
-  }
-}
 
 
 
