@@ -8,7 +8,7 @@ import '../../ui/utilitis/providers/theme_provider.dart';
 import '../widget/app_drawer.dart';
 
 class NewsScreen extends StatefulWidget {
- final AppCategory category;
+  final AppCategory category;
   const NewsScreen({super.key, required this.category});
 
   @override
@@ -16,7 +16,7 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NavigationScreenState extends State<NewsScreen> {
-  late ThemeProvider themeProvider ;
+  late ThemeProvider themeProvider;
   @override
   Widget build(BuildContext context) {
     themeProvider = Provider.of(context);
@@ -26,6 +26,4 @@ class _NavigationScreenState extends State<NewsScreen> {
       body: NewsTab(widget.category),
     );
   }
-
-
 }

@@ -1,13 +1,37 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../apis/api_manger.dart';
 import '../../../../model/source.dart';
+import '../../../../ui/utilitis/resources.dart';
 
-class NewsViewModel extends ChangeNotifier {
-  List<Source> sources = [];
+class NewsViewModel extends Cubit<NewsState> {
+  // List<Source> sources = [];
+  // bool isLoading = false;
+  // String massageError = '';
+Resources sourcesApi = Resources.initial();
+
+  NewsViewModel() : super(NewsState(sourcesApi: Resources.initial()));
 
   loadSources(String category) async {
-    sources = await ApiManager.loadSources(category);
-    notifyListeners();
+    try {
+      // isLoading = true;
+      // sourcesApi = Resources.loading();
+      // notifyListeners();
+      emit(NewsState(sourcesApi: Resources.loading()));
+
+      var sources = await ApiManager.loadSources(category);
+      emit(NewsState(sourcesApi: Resources.success(sources)));
+    } catch (e) {
+     emit(NewsState(sourcesApi: Resources.error(e.toString())));
+
+    }
+    // notifyListeners();
   }
+
+}
+class NewsState {
+  final Resources<List<Source>> sourcesApi;
+
+  NewsState({required this.sourcesApi});
 }
