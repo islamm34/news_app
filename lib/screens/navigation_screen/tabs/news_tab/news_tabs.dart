@@ -32,6 +32,7 @@ class _NewsTabState extends State<NewsTab> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => viewModel,
+
       child: BlocBuilder<NewsViewModel, NewsState>(
         builder: (context, state) {
           viewModel = context.read<NewsViewModel>();

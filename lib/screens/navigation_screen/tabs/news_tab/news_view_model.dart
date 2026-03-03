@@ -9,7 +9,7 @@ class NewsViewModel extends Cubit<NewsState> {
   // List<Source> sources = [];
   // bool isLoading = false;
   // String massageError = '';
-Resources sourcesApi = Resources.initial();
+  Resources sourcesApi = Resources.initial();
 
   NewsViewModel() : super(NewsState(sourcesApi: Resources.initial()));
 
@@ -23,13 +23,11 @@ Resources sourcesApi = Resources.initial();
       var sources = await ApiManager.loadSources(category);
       emit(NewsState(sourcesApi: Resources.success(sources)));
     } catch (e) {
-     emit(NewsState(sourcesApi: Resources.error(e.toString())));
-
+      emit(NewsState(sourcesApi: Resources.error(e.toString())));
     }
-    // notifyListeners();
   }
-
 }
+
 class NewsState {
   final Resources<List<Source>> sourcesApi;
 
