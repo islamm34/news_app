@@ -1,3 +1,4 @@
+
 import 'package:dio/dio.dart';
 
 import '../model/articles.dart';
@@ -6,33 +7,39 @@ import '../model/source.dart';
 import '../model/sources_respones.dart';
 
 abstract final class ApiManager {
-  static const baseUrl = "https://newsapi.org";
   static const apiKey = "337dc2b5fe7c467aacde1b358cbe785b";
-  static const sourcesApi = "/v2/top-headlines/sources";
-  static const articleApi = "/v2/everything";
+  static const baseurl = "https://newsapi.org";
+  static const sourcesEndPoint = "/v2/top-headlines/sources";
+  static const articlesEndPoint = "/v2/everything";
 
   static Future<List<Source>> loadSources(String categoryName) async {
-    Dio dio = Dio();
-    Response response = await dio.get(
-        "$baseUrl$sourcesApi?apiKey=$apiKey&category=$categoryName");
+    final dio = Dio();
+    // Response response =
+    //     await dio.get("$baseurl$sourcesEndPoint?apiKey=$apiKey&category=$categoryName");
+    Response response =
+    await dio.get("$baseurl$sourcesEndPoint", queryParameters: {
+      "apiKey": apiKey,
+      "category": categoryName,
+    });
     print(
-        "status code = ${response.statusCode} response.data = ${response
-            .data}");
-    if (response.statusCode == 200) {
-      SourcesResponse sourcesResponse = SourcesResponse.fromJson(response.data);
+        "loadSources:response.statusCode= ${response.statusCode} response: ${response.data}");
+    if (response.statusCode! >= 200 && response.statusCode! < 300) {
+      Map json = response.data;
+      SourcesResponse sourcesResponse = SourcesResponse.fromJson(json);
       return sourcesResponse.sources!;
     }
     throw "Something went wrong please try again later";
   }
 
   static Future<List<Article>> loadArticles(String sourceId) async {
-    Dio dio = Dio();
-    Response response =
-    await dio.get("$baseUrl$articleApi?apiKey=$apiKey&sources=$sourceId");
-    if (response.statusCode == 200) {
-      ArticlesResponse articlesResponse =
-      ArticlesResponse.fromJson(response.data);
-      return articlesResponse.articles!;
+    final dio = Dio();
+    Response response = await dio
+        .get("$baseurl$articlesEndPoint?apiKey=$apiKey&sources=$sourceId");
+
+    if (response.statusCode! >= 200 && response.statusCode! < 300) {
+      Map json = response.data;
+      ArticlesResponse articleResponse = ArticlesResponse.fromJson(json);
+      return articleResponse.articles!;
     }
     throw "Something went wrong please try again later";
   }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_list.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../apis/api_manger.dart';
 import '../../../../model/app_category.dart';
 import '../../../../model/source.dart';
 import '../../../../ui/utilitis/resources.dart';
@@ -18,7 +19,7 @@ class NewsTab extends StatefulWidget {
 }
 
 class _NewsTabState extends State<NewsTab> {
-  late NewsViewModel viewModel= NewsViewModel();
+  late NewsViewModel viewModel;
 
   @override
   void initState() {
@@ -30,42 +31,17 @@ class _NewsTabState extends State<NewsTab> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => viewModel,
-
-      child: BlocBuilder<NewsViewModel, NewsState>(
-        builder: (context, state) {
-          viewModel = context.read<NewsViewModel>();
-          if (state.sourcesApi.apiState == ApiState.loading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state.sourcesApi.apiState == ApiState.error) {
-            return Center(child: Text(state.sourcesApi.massageError!));
-          } else
-            state.sourcesApi.apiState == ApiState.success;
-          return buildTabsList(state.sourcesApi.data ?? []);
+    return ChangeNotifierProvider(
+      create: (context) => NewsViewModel(),
+      child: Builder(
+        builder: (context) {
+          viewModel = Provider.of(context, listen: true);
+          return viewModel.sources.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : buildTabsList(viewModel.sources!);
         },
       ),
     );
-    // return ChangeNotifierProvider(
-    //   create: (context) => NewsViewModel(),
-    //   child: Builder(
-    //     builder: (context) {
-    //       // viewModel = Provider.of(context, listen: true);
-    //       return Consumer<NewsViewModel>(
-    //         builder: (context, viewModel, _) {
-    //           this.viewModel = viewModel;
-    //           if (viewModel.sourcesApi.apiState == ApiState.loading) {
-    //             return Center(child: CircularProgressIndicator());
-    //           } else if (viewModel.sourcesApi.apiState == ApiState.error) {
-    //             return Center(child: Text(viewModel.sourcesApi.massageError!));
-    //           } else
-    //             viewModel.sourcesApi.apiState == ApiState.success;
-    //           return buildTabsList(viewModel.sourcesApi.data ?? []);
-    //         },
-    //       );
-    //     },
-    //   ),
-    // );
 
     // return FutureBuilder(
     //     future: ApiManager.loadSources(widget.category.name),
@@ -102,5 +78,13 @@ class _NewsTabState extends State<NewsTab> {
         ],
       ),
     );
+  }
+}
+class NewsViewModel extends ChangeNotifier {
+  List<Source> sources = [];
+
+  loadSources(String category) async {
+    sources = await ApiManager.loadSources(category);
+    notifyListeners();
   }
 }
