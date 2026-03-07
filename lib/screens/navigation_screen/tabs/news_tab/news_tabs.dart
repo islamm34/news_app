@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_list.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../apis/api_manger.dart';
 import '../../../../model/app_category.dart';
 import '../../../../model/source.dart';
-import '../../../../ui/utilitis/resources.dart';
-import 'news_view_model.dart';
 
 class NewsTab extends StatefulWidget {
   final AppCategory category;
@@ -38,7 +35,7 @@ class _NewsTabState extends State<NewsTab> {
           viewModel = Provider.of(context, listen: true);
           return viewModel.sources.isEmpty
               ? Center(child: CircularProgressIndicator())
-              : buildTabsList(viewModel.sources!);
+              : buildTabsList(viewModel.sources);
         },
       ),
     );
@@ -56,7 +53,7 @@ class _NewsTabState extends State<NewsTab> {
     //     });
   }
 
-  buildTabsList(List<Source> sources) {
+  DefaultTabController buildTabsList(List<Source> sources) {
     return DefaultTabController(
       length: sources.length,
       child: Column(
@@ -83,7 +80,7 @@ class _NewsTabState extends State<NewsTab> {
 class NewsViewModel extends ChangeNotifier {
   List<Source> sources = [];
 
-  loadSources(String category) async {
+    Future<void> loadSources(String category) async {
     sources = await ApiManager.loadSources(category);
     notifyListeners();
   }
