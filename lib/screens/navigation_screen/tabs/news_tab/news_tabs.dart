@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_list.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../apis/api_manger.dart';
-import '../../../../model/app_category.dart';
-import '../../../../model/source.dart';
+import '../../../../data/model/app_category.dart';
+import '../../../../data/repository/data_sources/remote_data_source/news_remote_data_source.dart';
+import '../../../view_model/mapper/sources_mapper.dart';
+import '../../../view_model/news_view_model.dart';
+import 'news_list.dart';
 
 class NewsTab extends StatefulWidget {
   final AppCategory category;
+  final NewsRemoteDataSource remoteDataSource;
+  final SourcesMapper sourcesMapper;
 
-  const NewsTab(this.category, {super.key});
+  const NewsTab({
+    Key? key,
+    required this.category,
+    required this.remoteDataSource,
+    required this.sourcesMapper,
+  }) : super(key: key);
 
   @override
   State<NewsTab> createState() => _NewsTabState();
@@ -29,31 +36,45 @@ class _NewsTabState extends State<NewsTab> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => NewsViewModel(),
+      create: (context) => NewsViewModel(
+        remoteDataSource: widget.remoteDataSource,
+        sourcesMapper: widget.sourcesMapper,
+      ),
       child: Builder(
         builder: (context) {
-          viewModel = Provider.of(context, listen: true);
-          return viewModel.sources.isEmpty
-              ? Center(child: CircularProgressIndicator())
-              : buildTabsList(viewModel.sources);
+          viewModel = Provider.of<NewsViewModel>(context, listen: true);
+
+          // استخدام Resources للحالات المختلفة
+          final resources = viewModel.sourcesApi;
+
+          return resources.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            success: (sources) => buildTabsList(sources),
+            error: (error) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: $error'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => viewModel.loadSources(widget.category.name),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+            initial: () => const SizedBox(),
+          );
         },
       ),
     );
-
-    // return FutureBuilder(
-    //     future: ApiManager.loadSources(widget.category.name),
-    //     builder: (context, snapshot) {
-    //       if (snapshot.hasError) {
-    //         return AppErrorWidget(message: snapshot.error.toString());
-    //       } else if (snapshot.hasData) {
-    //         return buildTabsList(snapshot.data!);
-    //       } else {
-    //         return Center(child: CircularProgressIndicator());
-    //       }
-    //     });
   }
 
-  DefaultTabController buildTabsList(List<Source> sources) {
+  Widget buildTabsList(List<Source> sources) {
+    if (sources.isEmpty) {
+      return const Center(child: Text('No sources available'));
+    }
+
     return DefaultTabController(
       length: sources.length,
       child: Column(
@@ -62,26 +83,18 @@ class _NewsTabState extends State<NewsTab> {
             tabAlignment: TabAlignment.start,
             isScrollable: true,
             tabs: sources
-                .map((source) => Tab(child: Text(source.name ?? "")))
+                .map((source) => Tab(child: Text(source.name)))
                 .toList(),
           ),
           Expanded(
             child: TabBarView(
               children: sources
-                  .map((source) => NewsList(sourceId: source))
+                  .map((source) => NewsList(sourceId: source.id))
                   .toList(),
             ),
           ),
         ],
       ),
     );
-  }
-}
-class NewsViewModel extends ChangeNotifier {
-  List<Source> sources = [];
-
-    Future<void> loadSources(String category) async {
-    sources = await ApiManager.loadSources(category);
-    notifyListeners();
   }
 }

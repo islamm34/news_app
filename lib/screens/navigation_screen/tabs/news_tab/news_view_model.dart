@@ -1,31 +1,38 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app/repository/news_repository/news_repository.dart';
+import 'package:flutter/material.dart';
+import '../../../data/repository/data_sources/remote_data_source/news_remote_data_source.dart';
+import '../../../domain/model/domain_source.dart';
+import '../../../domain/usecases/load_sources_usecase.dart';
+import '../../../ui/utilitis/resources.dart';
+import '../../mapper/sources_mapper.dart';
 
-import '../../../../apis/api_manger.dart';
-import '../../../../model/source.dart';
-import '../../../../ui/utilitis/resources.dart';
+class NewsViewModel extends ChangeNotifier {
+  final LoadSourcesUseCase loadSourcesUseCase;
+  Resources<List<Source>> sourcesApi = Resources.initial();
 
-class NewsViewModel extends Cubit<NewsState> {
-  Resources sourcesApi = Resources.initial();
-  NewsViewModel() : super(NewsState(sourcesApi: Resources.initial()));
-  NewsRepository repository = NewsRepository();
-  loadSources(String category) async {
+  NewsViewModel({
+    required NewsRemoteDataSource remoteDataSource,
+    required SourcesMapper sourcesMapper,
+  }) : loadSourcesUseCase = LoadSourcesUseCase(
+    remoteDataSource: remoteDataSource,
+    sourcesMapper: sourcesMapper,
+  );
+
+  Future<void> loadSources(String category) async {
     try {
-      // isLoading = true;
-      // sourcesApi = Resources.loading();
-      // notifyListeners();
-      emit(NewsState(sourcesApi: Resources.loading()));
+      // حالة التحميل
+      sourcesApi = Resources.loading();
+      notifyListeners();
 
-      var sources = await repository.loadSources(category);
-      emit(NewsState(sourcesApi: Resources.success(sources)));
+      // تنفيذ الـ UseCase - هنا بيرجع List<Source> مباشرة
+      final sources = await loadSourcesUseCase(category);
+
+      // حالة النجاح
+      sourcesApi = Resources.success(sources);
+      notifyListeners();
     } catch (e) {
-      emit(NewsState(sourcesApi: Resources.error(e.toString())));
+      // حالة الخطأ
+      sourcesApi = Resources.error(e.toString());
+      notifyListeners();
     }
   }
-}
-
-class NewsState {
-  final Resources<List<Source>> sourcesApi;
-
-  NewsState({required this.sourcesApi});
 }

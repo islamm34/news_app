@@ -1,4 +1,4 @@
-import '../ui/utilitis/app_assets.dart';
+import '../../ui/utilitis/app_assets.dart';
 
 class AppCategory {
   String name;

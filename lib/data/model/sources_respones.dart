@@ -1,8 +1,8 @@
-import 'source.dart';
+import 'remote_source.dart';
 
 class SourcesResponse {
   String? status;
-  List<Source>? sources;
+  List<RemoteSource>? sources;
 
   SourcesResponse({
     this.status,
@@ -14,7 +14,7 @@ class SourcesResponse {
     if (json['sources'] != null) {
       sources = [];
       json['sources'].forEach((v) {
-        sources?.add(Source.fromJson(v));
+        sources?.add(RemoteSource.fromJson(v));
       });
     }
   }

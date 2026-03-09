@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news_app/ui/utilitis/app_assets.dart';
 import 'package:news_app/ui/utilitis/extension/context_extension.dart';
 
-import '../../../../model/articles.dart';
+import '../../../../data/model/articles.dart';
 
 class NewsWidget extends StatelessWidget {
   final Article article;

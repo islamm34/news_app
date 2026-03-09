@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_tabs.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/app_category.dart';
+import '../../data/model/app_category.dart';
 import '../../ui/utilitis/app_colors.dart';
 import '../../ui/utilitis/providers/theme_provider.dart';
 import '../widget/app_drawer.dart';
