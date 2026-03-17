@@ -1,8 +1,8 @@
 import 'package:injectable/injectable.dart';
-import '../../../domain/model/domain_source.dart';
-import '../../../data/model/remote_source.dart';
+import 'package:news_app/domain/model/domain_source.dart';
+import 'package:news_app/data/model/remote_source.dart';
 
-@injectable
+@Injectable()
 class SourcesMapper {
   // تحويل RemoteSource لـ Source
   Source toSource(RemoteSource remoteSource) {
