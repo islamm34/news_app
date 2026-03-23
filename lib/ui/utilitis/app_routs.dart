@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../model/app_category.dart';
+import '../../data/model/app_category.dart';
 import '../../screens/navigation_screen/news_screen.dart';
 import '../../screens/navigation_screen/tabs/news_tab/categeries_tab/categeries_screen.dart';
 

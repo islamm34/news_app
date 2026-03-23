@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/model/source.dart';
+import 'package:news_app/data/model/remote_source.dart';
 import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_widget.dart';
 
 import '../../../../apis/api_manger.dart';
+import '../../../../domain/model/domain_source.dart';
 
 class NewsList extends StatelessWidget {
   final  Source sourceId;
