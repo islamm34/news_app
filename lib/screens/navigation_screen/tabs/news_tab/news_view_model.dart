@@ -20,18 +20,12 @@ class NewsViewModel extends ChangeNotifier {
 
   Future<void> loadSources(String category) async {
     try {
-      // حالة التحميل
       sourcesApi = Resources.loading();
       notifyListeners();
-
-      // تنفيذ الـ UseCase - هنا بيرجع List<Source> مباشرة
       final sources = await loadSourcesUseCase(category);
-
-      // حالة النجاح
       sourcesApi = Resources.success(sources);
       notifyListeners();
     } catch (e) {
-      // حالة الخطأ
       sourcesApi = Resources.error(e.toString());
       notifyListeners();
     }

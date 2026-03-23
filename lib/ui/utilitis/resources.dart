@@ -1,6 +1,7 @@
 enum ApiState { initial, loading, success, error }
 
 class Resources<E> {
+
   E? data;
   String? massageError;
   bool isLoading = false;
