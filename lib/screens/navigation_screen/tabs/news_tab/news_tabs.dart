@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_view_model.dart';
+import 'package:news_app/data/mapper/sources_mapper.dart';
+import 'package:news_app/data/repository/data_sources/remote_data_source/news_remote_data_source.dart';
+import 'package:news_app/screens/navigation_screen/tabs/news_tab/news_list.dart';
 import 'package:provider/provider.dart';
-import '../../../../data/mapper/sources_mapper.dart';
+
+import '../../../../apis/api_manger.dart';
 import '../../../../data/model/app_category.dart';
-import '../../../../data/repository/data_sources/remote_data_source/news_remote_data_source.dart';
 import '../../../../domain/model/domain_source.dart';
-import '../../../../ui/utilitis/resources.dart';
-import 'news_list.dart';
 
 class NewsTab extends StatefulWidget {
-  final AppCategory Category;
-  final NewsRemoteDataSource remoteDataSource;
-  final SourcesMapper sourcesMapper;
+  final AppCategory category;
 
   const NewsTab(
-    AppCategory category, {
-    Key? key,
-    required this.Category,
-    required this.remoteDataSource,
-    required this.sourcesMapper,
-  }) : super(key: key);
+    this.category, {
+    super.key,
+    required AppCategory Category,
+    required NewsRemoteDataSourceImpl remoteDataSource,
+    required SourcesMapper sourcesMapper,
+  });
 
   @override
   State<NewsTab> createState() => _NewsTabState();
@@ -32,55 +30,38 @@ class _NewsTabState extends State<NewsTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      viewModel.loadSources(widget.Category.name);
+      viewModel.loadSources(widget.category.name);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => NewsViewModel(
-        remoteDataSource: widget.remoteDataSource,
-        sourcesMapper: widget.sourcesMapper,
-      ),
+      create: (context) => NewsViewModel(),
       child: Builder(
         builder: (context) {
-          viewModel = Provider.of<NewsViewModel>(context, listen: true);
-
-          final resources = viewModel.sourcesApi;
-
-          if (resources.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (resources.apiState == ApiState.error) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error: ${resources.massageError}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () =>
-                        viewModel.loadSources(widget.Category.name),
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          } else if (resources.apiState == ApiState.success && resources.data != null) {
-            return buildTabsList(resources.data!);
-          } else {
-            return const SizedBox();
-          }
+          viewModel = Provider.of(context, listen: true);
+          return viewModel.sources.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : buildTabsList(viewModel.sources);
         },
       ),
     );
+
+    // return FutureBuilder(
+    //     future: ApiManager.loadSources(widget.category.name),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.hasError) {
+    //         return AppErrorWidget(message: snapshot.error.toString());
+    //       } else if (snapshot.hasData) {
+    //         return buildTabsList(snapshot.data!);
+    //       } else {
+    //         return Center(child: CircularProgressIndicator());
+    //       }
+    //     });
   }
 
-  Widget buildTabsList(List<Source> sources) {
-    if (sources.isEmpty) {
-      return const Center(child: Text('No sources available'));
-    }
-
+  DefaultTabController buildTabsList(List<Source> sources) {
     return DefaultTabController(
       length: sources.length,
       child: Column(
@@ -88,8 +69,9 @@ class _NewsTabState extends State<NewsTab> {
           TabBar(
             tabAlignment: TabAlignment.start,
             isScrollable: true,
-            tabs:
-                sources.map((source) => Tab(child: Text(source.name))).toList(),
+            tabs: sources
+                .map((source) => Tab(child: Text(source.name ?? "")))
+                .toList(),
           ),
           Expanded(
             child: TabBarView(
@@ -101,5 +83,14 @@ class _NewsTabState extends State<NewsTab> {
         ],
       ),
     );
+  }
+}
+
+class NewsViewModel extends ChangeNotifier {
+  List<Source> sources = [];
+
+  Future<void> loadSources(String category) async {
+    sources = (await ApiManager.loadSources(category)).cast<Source>();
+    notifyListeners();
   }
 }

@@ -2,7 +2,6 @@ import 'package:injectable/injectable.dart';
 import 'package:dio/dio.dart';
 import 'package:news_app/apis/api_client.dart';
 import '../../../model/remote_source.dart';
-import '../../../model/sources_respones.dart';
 
 abstract class NewsRemoteDataSource {
   Future<List<RemoteSource>> loadSources(String category);
