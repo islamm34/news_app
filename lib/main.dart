@@ -4,7 +4,6 @@ import 'package:news_app/screens/navigation_screen/tabs/news_tab/categeries_tab/
 import 'package:news_app/ui/utilitis/app_theme.dart';
 import 'package:news_app/ui/utilitis/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-
 import 'data/repository/data_sources/local_data_source/news_local_data_source.dart';
 import 'di/depedency_injection.dart';
 
